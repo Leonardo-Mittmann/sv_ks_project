@@ -1,27 +1,14 @@
 ;  Programa de Teste 1
-;  Autor Joao Leonardo Fragoso
-000C
-FFF1
-0000
-814F
-826E
-9106
-030A
-010B
-0201
-0200
-911B
-9118
-9100
-9100
+;  Autor Leonardo Mittmann Pagnossin
 0000
 0000
-0000
-FFFF
+8152
+8253
+910E
+A11B
+A209
 FFFF
 0000
-0001
-0002
 0000
 0000
 0000
@@ -29,8 +16,20 @@ FFFF
 0000
 0000
 0000
-FFFF
-FFFF
-FFFF
-; end of file
+0000
+0000
+0006
+0000
+0000
+0000
+0000
+0000
+0000
+0000
+0000
+0000
+0000
+1a57
+0000
+0000
 ; end of file

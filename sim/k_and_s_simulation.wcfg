@@ -11,15 +11,15 @@
       </db_ref>
    </db_ref_list>
    <zoom_setting>
-      <ZoomStartTime time="860940000fs"></ZoomStartTime>
-      <ZoomEndTime time="999340001fs"></ZoomEndTime>
-      <Cursor1Time time="892540000fs"></Cursor1Time>
+      <ZoomStartTime time="542910000fs"></ZoomStartTime>
+      <ZoomEndTime time="1045998012fs"></ZoomEndTime>
+      <Cursor1Time time="679386000fs"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
-      <NameColumnWidth column_width="158"></NameColumnWidth>
+      <NameColumnWidth column_width="130"></NameColumnWidth>
       <ValueColumnWidth column_width="58"></ValueColumnWidth>
    </column_width_setting>
-   <WVObjectSize size="35" />
+   <WVObjectSize size="40" />
    <wvobject fp_name="/tb_k_and_s/rst_n" type="logic">
       <obj_property name="ElementShortName">rst_n</obj_property>
       <obj_property name="ObjectShortName">rst_n</obj_property>
@@ -127,8 +127,8 @@
       <obj_property name="ObjectShortName">flags_reg_enable_s</obj_property>
    </wvobject>
    <wvobject fp_name="/tb_k_and_s/uut/decoded_instruction_s" type="array">
-      <obj_property name="ElementShortName">decoded_instruction_s[4:0]</obj_property>
-      <obj_property name="ObjectShortName">decoded_instruction_s[4:0]</obj_property>
+      <obj_property name="ElementShortName">decoded_instruction_s[15:0]</obj_property>
+      <obj_property name="ObjectShortName">decoded_instruction_s[15:0]</obj_property>
    </wvobject>
    <wvobject fp_name="/tb_k_and_s/uut/operation_s" type="array">
       <obj_property name="ElementShortName">operation_s[1:0]</obj_property>
@@ -169,5 +169,27 @@
    <wvobject fp_name="/tb_k_and_s/uut/control_unit_i/next_state" type="array">
       <obj_property name="ElementShortName">next_state[31:0]</obj_property>
       <obj_property name="ObjectShortName">next_state[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_k_and_s/uut/datapath_i/bus_a" type="array">
+      <obj_property name="ElementShortName">bus_a[15:0]</obj_property>
+      <obj_property name="ObjectShortName">bus_a[15:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_k_and_s/uut/datapath_i/bus_b" type="array">
+      <obj_property name="ElementShortName">bus_b[15:0]</obj_property>
+      <obj_property name="ObjectShortName">bus_b[15:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_k_and_s/uut/datapath_i/bus_c" type="array">
+      <obj_property name="ElementShortName">bus_c[15:0]</obj_property>
+      <obj_property name="ObjectShortName">bus_c[15:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_k_and_s/uut/datapath_i/alu_out" type="array">
+      <obj_property name="ElementShortName">alu_out[15:0]</obj_property>
+      <obj_property name="ObjectShortName">alu_out[15:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_k_and_s/uut/datapath_i/registr" type="array">
+      <obj_property name="ElementShortName">registr[0:3][15:0]</obj_property>
+      <obj_property name="ObjectShortName">registr[0:3][15:0]</obj_property>
+      <obj_property name="Radix">SIGNEDMAGRADIX</obj_property>
+      <obj_property name="isExpanded"></obj_property>
    </wvobject>
 </wave_config>

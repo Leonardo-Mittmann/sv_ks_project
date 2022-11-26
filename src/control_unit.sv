@@ -27,6 +27,16 @@ typedef enum{
     DECODE,
     S_LOAD_1,
     S_LOAD_2,
+    S_STORE_1,
+    S_STORE_2,
+    S_MOVE_1,
+    S_MOVE_2,
+    S_ADD_1,
+    S_ADD_2,
+    S_SUB_1,
+    S_SUB_2,
+    S_AND_1,
+    S_AND_2,
     S_HALT
 }state_t;
 
@@ -43,7 +53,7 @@ always_ff @(posedge clk or negedge rst_n) begin
     end
 end
     
-    always_comb begin : calc_next_state
+    always_comb begin
         branch = 1'b0;
         pc_enable = 1'b0;
         ir_enable = 1'b0;
@@ -56,11 +66,15 @@ end
         halt = 1'b0;
         case (state)
             FETCH_INSTRUCTION : begin
+                next_state = REGISTER_INSTRUCTION;
+            end
+            REGISTER_INSTRUCTION: begin
                 next_state = DECODE;
                 ir_enable = 1'b1;
                 pc_enable = 1'b1;
             end
             DECODE: begin
+            //DECODE
                 next_state = FETCH_INSTRUCTION;
                 case(decoded_instruction)
                     I_HALT: begin
@@ -68,17 +82,84 @@ end
                     end
                     I_LOAD: begin
                         next_state = S_LOAD_1;
-                        addr_sel = 1'b1;
                     end
-            end
+                    I_STORE: begin
+                        next_state = S_STORE_1;
+                    end
+                    I_MOVE: begin
+                        next_state = S_MOVE_1;
+                    end
+                    I_ADD: begin
+                        next_state = S_ADD_1;
+                    end
+                    I_SUB: begin
+                        next_state = S_SUB_1;
+                    end
                 endcase
-                
-             S_LOAD_1: begin
+             end
+            //EXECUTAR
+
+            //LOAD                    
+            S_LOAD_1: begin
                 next_state = S_LOAD_2;
                 addr_sel = 1'b1;
+            end
+            S_LOAD_2: begin
+                next_state = FETCH_INSTRUCTION;
+                addr_sel = 1'b1;
+                write_reg_enable = 1'b1;
                 c_sel = 1'b1;
-            end 
+            end
+            //STORE
+            S_STORE_1: begin
+                next_state = S_STORE_2;
+                addr_sel = 1'b1;
+            end
+            S_STORE_2: begin
+                next_state = FETCH_INSTRUCTION;
+                addr_sel = 1'b1;
+                ram_write_enable = 1'b1;
+            end
+            //MOVE
+            S_MOVE_1: begin
+                next_state = S_MOVE_2;
+                operation = 2'b10;   //ULA faz AND para nao mudar o valor
+            end
+            S_MOVE_2: begin
+                next_state = FETCH_INSTRUCTION;
+                operation = 2'b10;
+                write_reg_enable = 1'b1;
+            end
+            //ADD
+            S_ADD_1: begin
+                next_state = S_ADD_2;
+                operation = 2'b00;
+                flags_reg_enable = 1'b1;
+            end
+            S_ADD_2: begin
+                next_state = FETCH_INSTRUCTION;
+                operation = 2'b00;
+                flags_reg_enable = 1'b1;
+                write_reg_enable = 1'b1;
+            end
+            //SUB
+            S_SUB_1: begin
+                next_state = S_SUB_2;
+                operation = 2'b01;
+                flags_reg_enable = 1'b1;
+            end
+            S_SUB_2: begin
+                next_state = FETCH_INSTRUCTION;
+                operation = 2'b01;
+                flags_reg_enable = 1'b1;
+                write_reg_enable = 1'b1;
+            end
+            //HALT
+            S_HALT: begin
+                next_state = S_HALT;
+                halt = 1'b1;
+            end
         endcase
-    end : calc_next_state //always comb
+    end
 
 endmodule : control_unit

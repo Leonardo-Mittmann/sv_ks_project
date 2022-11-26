@@ -39,6 +39,7 @@ logic neg_f;
 logic overflow_f;
 logic signed_overflow_f;
 logic alu_carry_in;
+logic [15:0] registr[4];
 
 always_ff @(posedge clk) begin
     if (ir_enable) begin
@@ -62,25 +63,26 @@ end
 always_comb begin
     case (operation)
         2'b00: begin //ADD
-            {alu_carry_in, alu_out[14:0]} = bus_a[14:0] + bus_b[14:0];
+            {alu_carry_in, alu_out[14:0]} = bus_a[14:0]+ + bus_b[14:0];
             {overflow_f, alu_out[15]} = bus_a[15] + bus_b[15] + alu_carry_in;
             signed_overflow_f = overflow_f ^ alu_carry_in;
         end
-        2'b01: begin //AND
+        2'b01: begin //SUB
+            {alu_carry_in, alu_out[14:0]} = bus_a[14:0] + ~bus_b[14:0] + 1;
+            {overflow_f, alu_out[15]} = bus_a[15] + ~bus_b[15] + alu_carry_in;
+            signed_overflow_f = overflow_f ^ alu_carry_in;
+        end
+        2'b10: begin //AND
             alu_out = bus_a & bus_b;
             overflow_f = 1'b0;
             signed_overflow_f = 1'b0;
         end
-        2'b10: begin //OR
+        2'b11: begin //OR
             alu_out = bus_a | bus_b;
             overflow_f = 1'b0;
             signed_overflow_f = 1'b0;
         end
-        2'b11: begin //SUB
-            {alu_carry_in, alu_out[14:0]} = bus_a[14:0] + (-bus_b[14:0]);
-            {overflow_f, alu_out[15]} = bus_a[15] + bus_b[15] + alu_carry_in;
-            signed_overflow_f = overflow_f ^ alu_carry_in;
-        end
+
         default: begin
             $display("ERRO: Operacao da ULA invalida");
             alu_out = 'd1234;
@@ -90,8 +92,11 @@ always_comb begin
      endcase
 end
 
+//Calculo de flags
 assign zero_f = ~|(alu_out);
 assign neg_f = alu_out[15];
+
+//MUX
 assign bus_c = (c_sel?data_in:alu_out);
 assign ram_addr = (addr_sel?mem_addr:program_counter);
 
@@ -101,7 +106,7 @@ always_comb begin
     c_addr = 'd0;
     mem_addr = 'd0;
     case (instruction [15:8])
-    //--Movimentação de dados--
+    //--Movimentacao de dados--
     //LOAD
     8'b1000_0001: begin
         c_addr = instruction[6:5];
@@ -123,7 +128,7 @@ always_comb begin
         decoded_instruction = I_MOVE; 
     end
     
-    //--Aritimética--
+    //--Aritimetica--
     //ADD
     8'b1010_0001: begin
         decoded_instruction = I_ADD;
@@ -139,7 +144,7 @@ always_comb begin
         c_addr = instruction[5:4];
     end
     
-    //--Lógica--
+    //--Logica--
     //AND
     8'b1010_0011: begin
         decoded_instruction = I_AND;
@@ -198,4 +203,26 @@ always_comb begin
   endcase
 end
 
+
+//Registrador de flags
+always_ff @(posedge clk) begin
+    if (flags_reg_enable) begin
+        zero_op <= zero_f;
+        neg_op <= neg_f;
+        unsigned_overflow <= overflow_f;
+        signed_overflow <= signed_overflow_f;
+    end
+end
+
+//Registradores de uso geral
+always_ff @(posedge clk) begin
+    if (write_reg_enable) begin
+        registr[c_addr] <= bus_c;
+    end
+end 
+assign bus_a = registr[a_addr];
+assign bus_b = registr[b_addr];
+
+//Escrever na memoria
+assign data_out = bus_a;
 endmodule : data_path

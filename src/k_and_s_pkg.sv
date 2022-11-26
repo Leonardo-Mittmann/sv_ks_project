@@ -1,5 +1,5 @@
 package k_and_s_pkg;
-  typedef enum  logic [4:0] {
+  typedef enum  logic [15:0] {
     I_NOP = 16'b0000_0000_0000_0001,
     I_LOAD = 16'b0000_0000_0000_0010,
     I_STORE = 16'b0000_0000_0000_0100,
