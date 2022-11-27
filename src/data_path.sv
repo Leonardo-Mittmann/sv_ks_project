@@ -24,6 +24,7 @@ import k_and_s_pkg::*;
 logic [15:0] bus_a;
 logic [15:0] bus_b;
 logic [15:0] bus_c;
+logic [15:0] complement_a;
 logic [15:0] instruction;
 logic [15:0] alu_out;
 
@@ -41,12 +42,14 @@ logic signed_overflow_f;
 logic alu_carry_in;
 logic [15:0] registr[4];
 
+//Registrador de instrucao
 always_ff @(posedge clk) begin
     if (ir_enable) begin
         instruction <= data_in;
     end
 end
 
+//Program counter
 always_ff @(posedge clk or negedge rst_n) begin
     if (!rst_n) begin
         program_counter <= 'd0;
@@ -60,32 +63,37 @@ always_ff @(posedge clk or negedge rst_n) begin
     end
 end
 
+//ULA
+assign complement_a = -bus_a;
 always_comb begin
     case (operation)
-        2'b00: begin //ADD
-            {alu_carry_in, alu_out[14:0]} = bus_a[14:0]+ + bus_b[14:0];
+        //ADD
+        2'b00: begin
+            {alu_carry_in, alu_out[14:0]} = bus_a[14:0] + bus_b[14:0];
             {overflow_f, alu_out[15]} = bus_a[15] + bus_b[15] + alu_carry_in;
             signed_overflow_f = overflow_f ^ alu_carry_in;
         end
-        2'b01: begin //SUB
-            {alu_carry_in, alu_out[14:0]} = bus_a[14:0] + ~bus_b[14:0] + 1;
-            {overflow_f, alu_out[15]} = bus_a[15] + ~bus_b[15] + alu_carry_in;
+        //SUB
+        2'b01: begin
+            {alu_carry_in, alu_out[14:0]} = complement_a[14:0] + bus_b[14:0];
+            {overflow_f, alu_out[15]} = complement_a[15] + bus_b[15] + alu_carry_in;
             signed_overflow_f = overflow_f ^ alu_carry_in;
         end
-        2'b10: begin //AND
+        //AND
+        2'b10: begin 
             alu_out = bus_a & bus_b;
             overflow_f = 1'b0;
             signed_overflow_f = 1'b0;
         end
-        2'b11: begin //OR
+        //OR
+        2'b11: begin
             alu_out = bus_a | bus_b;
             overflow_f = 1'b0;
             signed_overflow_f = 1'b0;
         end
-
         default: begin
-            $display("ERRO: Operacao da ULA invalida");
-            alu_out = 'd1234;
+            $display("ERRO: Operacao da ULA invalida: op %d",operation);
+            alu_out = 'd4321;
             overflow_f = 1'b0;
             signed_overflow_f = 1'b0;
         end
@@ -100,6 +108,8 @@ assign neg_f = alu_out[15];
 assign bus_c = (c_sel?data_in:alu_out);
 assign ram_addr = (addr_sel?mem_addr:program_counter);
 
+
+//Decodificar instrucao
 always_comb begin
     a_addr = 'd0;
     b_addr = 'd0;
@@ -180,6 +190,11 @@ always_comb begin
         decoded_instruction = I_BOV;
         mem_addr = instruction[4:0];
     end
+    //BNOV
+    8'b0000_0110: begin
+        decoded_instruction = I_BNOV;
+        mem_addr = instruction[4:0];
+    end
     //BNNEG
     8'b0000_1010: begin
         decoded_instruction = I_BNNEG;
@@ -215,14 +230,13 @@ always_ff @(posedge clk) begin
 end
 
 //Registradores de uso geral
+assign bus_a = registr[a_addr];
+assign bus_b = registr[b_addr];
 always_ff @(posedge clk) begin
     if (write_reg_enable) begin
         registr[c_addr] <= bus_c;
     end
 end 
-assign bus_a = registr[a_addr];
-assign bus_b = registr[b_addr];
-
 //Escrever na memoria
 assign data_out = bus_a;
 endmodule : data_path

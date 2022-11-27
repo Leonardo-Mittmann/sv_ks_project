@@ -37,6 +37,15 @@ typedef enum{
     S_SUB_2,
     S_AND_1,
     S_AND_2,
+    S_OR_1,
+    S_OR_2,
+    S_BRANCH,
+    S_BZERO,
+    S_BNEG,
+    S_BOV,
+    S_BNOV,
+    S_BNNEG,
+    S_BNZERO,
     S_HALT
 }state_t;
 
@@ -95,10 +104,36 @@ end
                     I_SUB: begin
                         next_state = S_SUB_1;
                     end
+                    I_AND: begin
+                        next_state = S_AND_1;
+                    end
+                    I_OR: begin
+                        next_state = S_OR_1;
+                    end
+                    I_BRANCH: begin
+                        next_state = S_BRANCH;
+                    end
+                    I_BZERO: begin
+                        next_state = S_BZERO;
+                    end
+                    I_BNEG: begin
+                        next_state = S_BNEG;
+                    end
+                    I_BOV: begin
+                        next_state = S_BOV;
+                    end
+                    I_BNOV: begin
+                        next_state = S_BNOV;
+                    end
+                    I_BNNEG: begin
+                        next_state = S_BNNEG;
+                    end
+                    I_BNZERO: begin
+                        next_state = S_BNZERO;
+                    end               
                 endcase
              end
-            //EXECUTAR
-
+            //--EXECUTAR--
             //LOAD                    
             S_LOAD_1: begin
                 next_state = S_LOAD_2;
@@ -153,6 +188,72 @@ end
                 operation = 2'b01;
                 flags_reg_enable = 1'b1;
                 write_reg_enable = 1'b1;
+            end
+            //AND
+            S_AND_1: begin
+                next_state = S_AND_2;
+                operation = 2'b10;
+                flags_reg_enable = 1'b1;
+            end
+            S_AND_2: begin
+                next_state = FETCH_INSTRUCTION;
+                operation = 2'b10;
+                flags_reg_enable = 1'b1;
+                write_reg_enable = 1'b1;
+            end
+            //OR
+            S_OR_1: begin
+                next_state = S_OR_2;
+                operation = 2'b11;
+                flags_reg_enable = 1'b1;
+            end
+            S_OR_2: begin
+                next_state = FETCH_INSTRUCTION;
+                operation = 2'b11;
+                flags_reg_enable = 1'b1;
+                write_reg_enable = 1'b1;
+            end
+            //BRANCH
+            S_BRANCH: begin
+                next_state = FETCH_INSTRUCTION;
+                pc_enable = 1'b1;
+                branch = 1'b1;
+            end
+            //BZERO
+            S_BZERO: begin
+                next_state = FETCH_INSTRUCTION;
+                pc_enable = 1'b1;
+                branch = zero_op;
+            end
+            //BNEG
+            S_BNEG: begin
+                next_state = FETCH_INSTRUCTION;
+                pc_enable = 1'b1;
+                branch = neg_op;
+            end
+            //BOV
+            S_BOV: begin
+                next_state = FETCH_INSTRUCTION;
+                pc_enable = 1'b1;
+                branch = unsigned_overflow;
+            end
+            //BNOV
+            S_BNOV: begin
+                next_state = FETCH_INSTRUCTION;
+                pc_enable = 1'b1;
+                branch = ~unsigned_overflow;
+            end
+            //BNNEG
+            S_BNNEG: begin
+                next_state = FETCH_INSTRUCTION;
+                pc_enable = 1'b1;
+                branch = ~neg_op;
+            end
+            //BNZERO
+            S_BNZERO: begin
+                next_state = FETCH_INSTRUCTION;
+                pc_enable = 1'b1;
+                branch = ~zero_op;
             end
             //HALT
             S_HALT: begin
