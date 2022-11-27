@@ -1,4 +1,3 @@
-//control unit
 module control_unit
 import k_and_s_pkg::*;
 (
@@ -222,37 +221,37 @@ end
             //BZERO
             S_BZERO: begin
                 next_state = FETCH_INSTRUCTION;
-                pc_enable = 1'b1;
+                pc_enable = zero_op;
                 branch = zero_op;
             end
             //BNEG
             S_BNEG: begin
                 next_state = FETCH_INSTRUCTION;
-                pc_enable = 1'b1;
+                pc_enable = neg_op;
                 branch = neg_op;
             end
             //BOV
             S_BOV: begin
                 next_state = FETCH_INSTRUCTION;
-                pc_enable = 1'b1;
+                pc_enable = unsigned_overflow;
                 branch = unsigned_overflow;
             end
             //BNOV
             S_BNOV: begin
                 next_state = FETCH_INSTRUCTION;
-                pc_enable = 1'b1;
+                pc_enable = ~unsigned_overflow;
                 branch = ~unsigned_overflow;
             end
             //BNNEG
             S_BNNEG: begin
                 next_state = FETCH_INSTRUCTION;
-                pc_enable = 1'b1;
+                pc_enable = ~neg_op;
                 branch = ~neg_op;
             end
             //BNZERO
             S_BNZERO: begin
                 next_state = FETCH_INSTRUCTION;
-                pc_enable = 1'b1;
+                pc_enable = ~zero_op;
                 branch = ~zero_op;
             end
             //HALT
