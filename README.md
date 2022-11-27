@@ -1,8 +1,3 @@
-## Knob and Switch Simulador em VHDL
+## Knob and Switch Simulador em SystemVerilog
 
-Este é um repositório mantido como o projeto inicial para configurar o Xilinx Vivado para o desenvolvimento
-do projeto do simulador do K&S em VHDL.
-
-Aqui estão todos os arquivos necessários para a simulação e validação dos projetos desenvolvidos pelos alunos
-do curso de Engenharia de Computação da Uergs em Guaíba.
-
+Implementação do processador K&S, feito como trabalho da disciplina de Sistemas Digitais do curso de Engenharia de Computação na Unidade de Guaíba da Universidade Estadual do Rio Grande do Sul. Inclui também um relatório sobre o desenvolvimento do projeto.
