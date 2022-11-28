@@ -1,0 +1,160 @@
+## Relatório
+
+Algoritmo:
+1. O datapath lê a instrução da memória e decodifica
+2. A unidade de controle entra em um estado correspondente a instrução decodificada. Existem 2 estados para cada instrução, exceto HALT e as instruções de desvio (BRANCH, BNEG, BZERO, etc). Todas as instruções não identificadas são interpretadas como NOP.
+3. A unidade de controle habilita os sinais necessários para executar a operação baseado no seu estado atual. 
+4. Caso a operação executada seja HALT, a unidade de controle liga o sinal HALT e permanece no mesmo estado. Caso contrário, volta ao passo 1.
+
+---
+
+Codificações:
+Estados da Unidade de Controle - Foi utilizada um enum da linguagem SystemVerilog, o que por padrão gera uma codificação binária:
+ FETCH_INSTRUCTION = 0
+ REGISTER_INSTRUCTION = 1
+ DECODE = 2
+ S_LOAD_1 = 3
+ S_LOAD_2 = 4
+ S_STORE_1 = 5
+ S_STORE_2 = 6
+ S_MOVE_1 = 7
+ S_MOVE_2 = 8
+ S_ADD_1 = 9
+ S_ADD_2 = 10
+ S_SUB_1 = 11
+ S_SUB_2 = 12
+ S_AND_1 = 13
+ S_AND_2 = 14
+ S_OR_1 = 15
+ S_OR_2 = 16
+ S_BRANCH = 17
+ S_BZERO = 18
+ S_BNEG = 19
+ S_BOV = 20
+ S_BNOV = 21
+ S_BNNEG = 22
+ S_BNZERO = 23
+ S_HAL = 24
+
+Instrução decodificada - Foi usada codificação one-hot:
+ I_NOP =    0000 0000 0000 0001
+ I_LOAD =   0000 0000 0000 0010
+ I_STORE =  0000 0000 0000 0100
+ I_MOVE =   0000 0000 0000 1000
+ I_ADD =    0000 0000 0001 0000
+ I_SUB =    0000 0000 0010 0000
+ I_AND =    0000 0000 0100 0000
+ I_OR =     0000 0000 1000 0000
+ I_BRANCH = 0000 0001 0000 0000
+ I_BZERO =  0000 0010 0000 0000
+ I_BNZERO = 0000 0100 0000 0000
+ I_BNEG =   0000 1000 0000 0000
+ I_BNNEG =  0001 0000 0000 0000
+ I_BOV =    0010 0000 0000 0000
+ I_BNOV =   0100 0000 0000 0000
+ I_HALT =   1000 0000 0000 0000
+
+ULA - Foi usada codificação binária:
+ADD = 0
+SUB = 1
+AND = 2
+OR = 3
+
+---
+
+Programas utilizados em testes:
+;Esse programa calcula o MDC dos números da posição 30 e 29 da memória e armazena na posição 31. Foi desenvolvido durante a disciplina de Arquitetura de Computadores 1
+LOAD R0 29
+LOAD R1 30
+SUB R3 R0 R1
+BNEG 5
+BRANCH 8
+LOAD R0 30
+LOAD R1 29
+LOAD R2 28
+SUB R0 R0 R1
+BNEG 12
+BZERO 16
+BRANCH 8
+ADD R0 R0 R1
+STORE 29 R0
+STORE 30 R1
+BRANCH 0
+STORE 31 R1
+HALT
+NOP
+NOP
+NOP
+NOP
+NOP
+NOP
+NOP
+NOP
+NOP
+NOP
+NOP
+MEM 15
+MEM 20
+NOP
+
+
+;Programa utlizado para testar as instruções de desvio. Caso todos os branches funcionem, o programa chega até o fim e coloca todos os registradores em 0
+;Note que o montador não traduz as instruções BNNEG 11 e BNZERO 14 corretamente. A versão corrigida encontra-se abaixo 
+load r0 19
+sub r1 r0 r0
+bzero 4
+halt
+load r1 20
+sub r2 r0 r1
+bneg 8
+halt
+add r3 r0 r1
+bnneg 11 ; 0 000 1010 000 MMMMM | A0B
+halt
+add r3 r0 r1
+bnzero 14 ;0 000 1011 000 MMMMM | B0E
+halt
+sub r0 r0 r0
+sub r1 r1 r1
+sub r2 r2 r2
+sub r3 r3 r3
+halt
+mem 20
+mem 30
+
+
+; Teste branch corrigido
+8113
+A210
+0204
+FFFF
+8134
+A221
+0308
+FFFF
+A131
+0A0B
+FFFF
+A131
+0B0E
+FFFF
+A200
+A215
+A22A
+A23F
+FFFF
+0014
+001E
+0000
+0000
+0000
+0000
+0000
+0000
+0000
+0000
+0000
+0000
+0000
+;end of file
+;end of file
