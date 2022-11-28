@@ -259,6 +259,9 @@ end
                 next_state = S_HALT;
                 halt = 1'b1;
             end
+            default: begin
+                next_state = FETCH_INSTRUCTION;
+            end
         endcase
     end
 
